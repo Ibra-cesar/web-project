@@ -1,0 +1,23 @@
+{
+  "name": "web-project",
+  "version": "1.0.0",
+  "description": "learning http method",
+  "main": "index.js",
+  "scripts": {
+    "start": "node main.js",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ibra-cesar/web-project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ibra-cesar/web-project/issues"
+  },
+  "homepage": "https://github.com/Ibra-cesar/web-project#readme",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
