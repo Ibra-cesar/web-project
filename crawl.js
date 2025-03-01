@@ -1,48 +1,67 @@
-const { JSDOM } = require('jsdom')
+const { JSDOM } = require("jsdom");
 
-async function crawlURL (currentUrl){
-    console.log(`crawling ${currentUrl}...`)
+async function crawlURL(currentUrl) {
+  console.log(`crawling ${currentUrl}...`);
+  try {
+    const resp = await fetch(currentUrl);
+    if (resp.status > 399) {
+      console.log(
+        `error in fetch with status cod : ${resp.status} on page : ${currentUrl}`
+      );
+      return;
+    }
 
-    const resp = await fetch(currentUrl)
+    const contentType = resp.headers.get("content-type");
 
-    console.log(resp.text())
+    if (!contentType.includes("text/html")) {
+      console.log(
+        `non html content type : ${contentType} on page : ${currentUrl}`
+      );
+      return;
+    }
+    console.log(await resp.text());
+  } catch (error) {
+    console.log(
+      `error while fetching: ${error.message} on page: ${currentUrl}`
+    );
+  }
 }
 
 function normalURL(urlString) {
   const urlObj = new URL(urlString);
-  const hostPath =  `${urlObj.hostname}${urlObj.pathname}`
-  if(hostPath.length > 0 && hostPath.slice(-1) === '/'){
-    return hostPath.slice(0, -1)
+  const hostPath = `${urlObj.hostname}${urlObj.pathname}`;
+  if (hostPath.length > 0 && hostPath.slice(-1) === "/") {
+    return hostPath.slice(0, -1);
   }
-  return hostPath
+  return hostPath;
 }
 
-function getURL(htmlBody, baseURL){
-    const urls = [];
-    const dom = new JSDOM(htmlBody)
-    const linkEls = dom.window.document.querySelectorAll('a')
-    for(const linkEl of linkEls){  
-        if(linkEl.href.slice(0, 1) === '/'){
-            try {
-                const urlObj = new URL(`${baseURL}${linkEl.href}`);
-                urls.push(`${urlObj.href}`);
-            } catch (error) {
-                console.log(`invalid url: ${error.message}`)
-            }
-        }else{
-            try {
-                const urlObj = new URL(linkEl.href);
-                urls.push(`${urlObj.href}`);
-            } catch (error) {
-                console.log(`invalid url: ${error.message}`)
-            }
-        }
+function getURL(htmlBody, baseURL) {
+  const urls = [];
+  const dom = new JSDOM(htmlBody);
+  const linkEls = dom.window.document.querySelectorAll("a");
+  for (const linkEl of linkEls) {
+    if (linkEl.href.slice(0, 1) === "/") {
+      try {
+        const urlObj = new URL(`${baseURL}${linkEl.href}`);
+        urls.push(`${urlObj.href}`);
+      } catch (error) {
+        console.log(`invalid url: ${error.message}`);
+      }
+    } else {
+      try {
+        const urlObj = new URL(linkEl.href);
+        urls.push(`${urlObj.href}`);
+      } catch (error) {
+        console.log(`invalid url: ${error.message}`);
+      }
     }
-    return urls
+  }
+  return urls;
 }
 
 module.exports = {
-    normalURL,
-    getURL,
-    crawlURL
-}
+  normalURL,
+  getURL,
+  crawlURL,
+};
