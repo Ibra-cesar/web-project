@@ -1,16 +1,20 @@
-const { crawlURL } = require('./crawl.js')
+const { crawlURL } = require("./crawl.js");
 
-function main(){
-    if(process.argv.length < 3){
-        console.log('no website provided')
-        process.exit(1)
-    }
-    if(process.argv.length > 3){
-        console.log("cannot crawl 2 website");
-        process.exit(1);
-    }
-    const baseUrl = process.argv[2]
-    console.log(`crawiling... ${baseUrl}`)
-    crawlURL(baseUrl)
+function main() {
+  if (process.argv.length < 3) {
+    console.log("no website provided");
+    process.exit(1);
+  }
+  if (process.argv.length > 3) {
+    console.log("cannot crawl 2 website");
+    process.exit(1);
+  }
+  const baseUrl = process.argv[2];
+  console.log(`crawiling... ${baseUrl}`);
+  const pages = crawlURL(baseUrl, baseUrl, {});
+
+  for (const page of Object.entries(pages)) {
+    console.log(page);
+  }
 }
-main()
+main();
