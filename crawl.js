@@ -1,5 +1,13 @@
 const { JSDOM } = require('jsdom')
 
+async function crawlURL (currentUrl){
+    console.log(`crawling ${currentUrl}...`)
+
+    const resp = await fetch(currentUrl)
+
+    console.log(resp.text())
+}
+
 function normalURL(urlString) {
   const urlObj = new URL(urlString);
   const hostPath =  `${urlObj.hostname}${urlObj.pathname}`
@@ -35,5 +43,6 @@ function getURL(htmlBody, baseURL){
 
 module.exports = {
     normalURL,
-    getURL
+    getURL,
+    crawlURL
 }
