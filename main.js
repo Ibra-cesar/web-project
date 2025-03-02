@@ -1,20 +1,18 @@
 const { crawlURL } = require("./crawl.js");
+const { printReport } = require("./list.js");
 
-function main() {
+async function main() {
   if (process.argv.length < 3) {
     console.log("no website provided");
-    process.exit(1);
   }
   if (process.argv.length > 3) {
     console.log("cannot crawl 2 website");
-    process.exit(1);
   }
   const baseUrl = process.argv[2];
-  console.log(`crawiling... ${baseUrl}`);
-  const pages = crawlURL(baseUrl, baseUrl, {});
 
-  for (const page of Object.entries(pages)) {
-    console.log(page);
-  }
+  console.log(`crawiling... ${baseUrl}`);
+  const pages = await crawlURL(baseUrl, baseUrl, {});
+
+  printReport(pages)
 }
 main();

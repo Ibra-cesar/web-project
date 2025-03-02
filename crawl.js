@@ -1,50 +1,44 @@
 const { JSDOM } = require("jsdom");
 
-async function crawlURL(baseUrl, currentUrl, pages) {
-  const baseUrlObj = new URL(baseUrl);
-  const currentUrlObj = new URL(currentUrl);
-  if (baseUrlObj.hostname !== currentUrlObj.hostname) {
+async function crawlURL(baseURL, currentURL, pages) {
+  const currentUrlObj = new URL(currentURL);
+  const baseUrlObj = new URL(baseURL);
+  if (currentUrlObj.hostname !== baseUrlObj.hostname) {
     return pages;
   }
 
-  const normalCurrentUrl = normalURL(currentUrl)
-  if(pages[normalCurrentUrl] > 0) {
-    pages[normalCurrentUrl]++
-    return pages
+  const normalizeURL = normalURL(currentURL);
+  if (pages[normalizeURL] > 0) {
+    pages[normalizeURL]++;
+    return pages;
   }
 
-  pages[normalCurrentUrl] = 1
-  console.log(`crawling ${currentUrl}...`);
+  pages[normalizeURL] = 1;
+  console.log(`crawling on: ${currentURL}`);
 
+  let htmlBody = "";
   try {
-    const resp = await fetch(currentUrl);
-    if (resp.status > 399) {
-      console.log(
-        `error in fetch with status cod : ${resp.status} on page : ${currentUrl}`
-      );
+    const response = await fetch(currentURL);
+    if (response.status > 399) {
+      console.log(`HTTP error, status code: ${response.status}`);
       return pages;
     }
 
-    const contentType = resp.headers.get("content-type");
-
+    const contentType = response.headers.get("content-type");
     if (!contentType.includes("text/html")) {
-      console.log(
-        `non html content type : ${contentType} on page : ${currentUrl}`
-      );
+      console.log(`no HTML response: ${contentType}`);
       return pages;
     }
-    const htmlBody = await resp.text()
-    const nextUrls = getURL(htmlBody, baseUrl)
-
-    for(const nextUrl of nextUrls){
-        pages = crawlURL(baseUrl, nextUrl, pages)
-    }
-  } catch (error) {
-    console.log(
-      `error while fetching: ${error.message} on page: ${currentUrl}`
-    );
+    htmlBody = await response.text();
+  } catch (err) {
+    console.log(err.message);
   }
-  return pages
+
+  const nextURLs = getURL(htmlBody, baseURL);
+  for (const nextURL of nextURLs) {
+    pages = await crawlURL(baseURL, nextURL, pages);
+  }
+  return pages;
 }
 
 function normalURL(urlString) {
